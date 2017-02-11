@@ -1,6 +1,8 @@
 Shadow DOM in React
 
 ### Props 
+props you can pass in:
+
 ```
 static propTypes = {
   children: PropTypes.node.isRequired,

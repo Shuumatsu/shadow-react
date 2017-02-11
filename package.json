@@ -1,7 +1,22 @@
 {
   "name": "shadow-react",
-  "version": "0.1.1",
+  "description": "wrap your component in shadow dom",
+  "keywords": [
+    "shadow dom",
+    "react",
+    "css"
+  ],
+  "version": "0.1.2",
   "main": "dist/ShadowReact.js",
+  "homepage": "https://github.com/VanishingDante/shadow-react",
+  "bugs": {
+    "url": "https://github.com/VanishingDante/shadow-react/issues",
+    "email": "VanishingDante@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VanishingDante/shadow-react.git"
+  },
   "devDependencies": {
     "babel-cli": "^6.22.2",
     "react-scripts": "0.8.5"

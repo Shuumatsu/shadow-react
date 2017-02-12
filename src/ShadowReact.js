@@ -27,6 +27,7 @@ export default class ShadowReact extends Component {
       <this.props.wrapperTag>
         {this.props.htmlString && <div dangerouslySetInnerHTML={{ __html: this.props.htmlString }} />}
         {this.props.children.props.children}
+        <div ref={includesContainer => this.includesContainer = includesContainer} />
       </this.props.wrapperTag>
     )
 
@@ -35,7 +36,9 @@ export default class ShadowReact extends Component {
     return root
   }
 
-  async attachIncludes(root) {
+  async attachIncludes() {
+    this.includesContainer.innerHTML = ''
+
     const { includes } = this.props
     if (!includes.length) return
     this.setState({ fetching: true })
@@ -66,13 +69,13 @@ export default class ShadowReact extends Component {
         fragment.appendChild(element)
     })
 
-    root.appendChild(fragment)
+    this.includesContainer.appendChild(fragment)
     this.setState({ fetching: false })
   }
 
   componentDidMount() {
-    const root = this.attachShadow()
-    this.attachIncludes(root)
+    this.attachShadow()
+    this.attachIncludes()
   }
 
   render() {
@@ -86,8 +89,8 @@ export default class ShadowReact extends Component {
 
   update() {
     return new Promise(async resolve => {
-      const root = this.attachShadow()
-      await this.attachIncludes(root)
+      this.attachShadow()
+      await this.attachIncludes()
       resolve()
     })
   }

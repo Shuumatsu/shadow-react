@@ -3,10 +3,10 @@ import logo from './logo.svg'
 import ShadowReact from './ShadowReact'
 
 class App extends Component {
-  
+
   render() {
     return (
-      <ShadowReact includes={['App.css']}>
+      <ShadowReact wrapperTag={'article'} includes={['App.css']}>
         <div className="ShadowReact demo">
           <div className="App">
             <div className="App-header">

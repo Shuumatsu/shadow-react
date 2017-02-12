@@ -5,29 +5,33 @@ import { dissocPath } from 'lodash/fp'
 export default class ShadowReact extends Component {
 
   static propTypes = {
+    boundaryMode: PropTypes.oneOf(['open', 'closed']),
     children: PropTypes.node.isRequired,
     includes: PropTypes.array,
+    htmlString: PropTypes.string,
+    htmlStringWrapperTag: PropTypes.string,
     wrapperTag: PropTypes.string,
-    boundaryMode: PropTypes.oneOf(['open', 'closed']),
-    htmlString: PropTypes.string
   }
 
   static defaultProps = {
     includes: [],
     wrapperTag: 'div',
+    htmlStringWrapperTag: 'div',
     boundaryMode: 'open'
   }
 
   state = { fetching: false }
+
+  includesContainer = document.createElement('div')
+  includesContainerAttached = false
 
   attachShadow() {
     const host = this.refs.host
     const root = host.shadowRoot || host.attachShadow({ mode: this.props.boundaryMode })
     const el = (
       <this.props.wrapperTag>
-        {this.props.htmlString && <div dangerouslySetInnerHTML={{ __html: this.props.htmlString }} />}
+        {this.props.htmlString && <this.props.htmlStringWrapperTag dangerouslySetInnerHTML={{ __html: this.props.htmlString }} />}
         {this.props.children.props.children}
-        <div ref={includesContainer => this.includesContainer = includesContainer} />
       </this.props.wrapperTag>
     )
 
@@ -36,8 +40,13 @@ export default class ShadowReact extends Component {
     return root
   }
 
-  async attachIncludes() {
-    this.includesContainer.innerHTML = ''
+  async attachIncludes(root) {
+    if (!this.includesContainerAttached) {
+      root.appendChild(this.includesContainer)
+      this.includesContainerAttached = true
+    } else {
+      this.includesContainer.innerHTML = ''
+    }
 
     const { includes } = this.props
     if (!includes.length) return
@@ -74,8 +83,8 @@ export default class ShadowReact extends Component {
   }
 
   componentDidMount() {
-    this.attachShadow()
-    this.attachIncludes()
+    const root = this.attachShadow()
+    this.attachIncludes(root)
   }
 
   render() {
@@ -89,8 +98,8 @@ export default class ShadowReact extends Component {
 
   update() {
     return new Promise(async resolve => {
-      this.attachShadow()
-      await this.attachIncludes()
+      const root = this.attachShadow()
+      await this.attachIncludes(root)
       resolve()
     })
   }

@@ -4,24 +4,42 @@ Shadow DOM in React
 props you can pass in:
 
 ```
-static propTypes = {
-  children: PropTypes.node.isRequired,
-  includes: PropTypes.array,
-  wrapperTag: PropTypes.string,
-  boundaryMode: PropTypes.oneOf(['open', 'closed'])
-  htmlString: PropTypes.string
-}
+  static propTypes = {
+    boundaryMode: PropTypes.oneOf(['open', 'closed']),
+    children: PropTypes.node.isRequired,
+    includes: PropTypes.array,
+    htmlString: PropTypes.string,
+    htmlStringWrapperTag: PropTypes.string,
+    wrapperTag: PropTypes.string,
+  }
 
-static defaultProps = {
-  includes: [],
-  wrapperTag: 'div',
-  boundaryMode: 'open'
-}
+  static defaultProps = {
+    includes: [],
+    wrapperTag: 'div',
+    htmlStringWrapperTag: 'div',
+    boundaryMode: 'open'
+  }
 ```
 
 1. the direct child of this React Component must be a html tag rather than a React Component, because the direct child will be the the host element of the shadow dom
 2. htmlString provided will be added into the shadow dom right before the direct child's children
 3. includes will be added after the direct child's children in order
+
+### Update
+Since then shadow dom will not change when the `render` called, use the provided method update to update component
+
+```
+shadowReact.update().then(()=> console.log('updated))
+
+// update() {
+//   return new Promise(async resolve => {
+//     const root = this.attachShadow()
+//     await this.attachIncludes(root)
+//     resolve()
+//   })
+// }
+```
+
 
 ### Flash of unstyled content
 Since documents specified in the `includes` prop are fetched over the network, so a hook is provided, 

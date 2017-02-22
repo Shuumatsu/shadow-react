@@ -6,7 +6,7 @@ class App extends Component {
 
   render() {
     return (
-      <ShadowReact wrapperTag={'article'} includes={['App.css']}>
+      <ShadowReact wrapperTag={'article'} includes={['App.css']} attachedCallback={console.log}>
         <div className="ShadowReact demo">
           <div className="App">
             <div className="App-header">

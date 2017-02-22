@@ -11,6 +11,7 @@ export default class ShadowReact extends Component {
     htmlString: PropTypes.string,
     htmlStringWrapperTag: PropTypes.string,
     wrapperTag: PropTypes.string,
+    attachedCallback: PropTypes.func
   }
 
   static defaultProps = {
@@ -37,19 +38,29 @@ export default class ShadowReact extends Component {
 
     render(el, root)
 
+    this.shadowRoot = root
     return root
   }
 
+  attachedCallback() {
+    const { attachedCallback } = this.props
+    attachedCallback && attachedCallback(this)
+  }
+
   async attachIncludes(root) {
-    if (!this.includesContainerAttached) {
+    if (this.includesContainerAttached) {
+      this.includesContainer.innerHTML = ''
+    } else {
       root.appendChild(this.includesContainer)
       this.includesContainerAttached = true
-    } else {
-      this.includesContainer.innerHTML = ''
     }
 
     const { includes } = this.props
-    if (!includes.length) return
+    if (!includes.length) {
+      this.attachedCallback()
+      return
+    }
+
     this.setState({ fetching: true })
 
     const fragment = document.createDocumentFragment()
@@ -79,7 +90,7 @@ export default class ShadowReact extends Component {
     })
 
     this.includesContainer.appendChild(fragment)
-    this.setState({ fetching: false })
+    this.setState({ fetching: false }, this.attachedCallback())
   }
 
   componentDidMount() {

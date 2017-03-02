@@ -90,7 +90,7 @@ export default class ShadowReact extends Component {
     })
 
     this.includesContainer.appendChild(fragment)
-    this.setState({ fetching: false }, this.attachedCallback())
+    this.refs.host && this.setState({ fetching: false }, this.attachedCallback())
   }
 
   componentDidMount() {

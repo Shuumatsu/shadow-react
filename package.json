@@ -6,7 +6,7 @@
     "react",
     "css"
   ],
-  "version": "0.3.1",
+  "version": "0.3.2",
   "main": "dist/ShadowReact.js",
   "homepage": "https://github.com/VanishingDante/shadow-react",
   "bugs": {
@@ -22,13 +22,13 @@
     "build": "BABEL_ENV=production babel src/ShadowReact.js -o dist/ShadowReact.js -s --minified"
   },
   "devDependencies": {
-    "babel-cli": "^6.22.2",
-    "babel-preset-react-app": "^2.1.0",
-    "react-scripts": "0.8.5"
+    "babel-cli": "^6.24.1",
+    "babel-preset-react-hot-reload": "^0.4.0",
+    "react-scripts": "^0.9.5"
   },
   "dependencies": {
     "lodash": "^4.17.4",
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2"
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
   }
 }

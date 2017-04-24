@@ -1,9 +1,9 @@
-import React, { Component, PropTypes, Children } from 'react'
+import React, { Component, Children } from 'react'
 import { render } from 'react-dom'
+import PropTypes from 'prop-types'
 import { dissocPath } from 'lodash/fp'
 
-export default class ShadowReact extends Component {
-
+export default class extends Component {
   static propTypes = {
     boundaryMode: PropTypes.oneOf(['open', 'closed']),
     children: PropTypes.node.isRequired,
@@ -21,13 +21,8 @@ export default class ShadowReact extends Component {
     boundaryMode: 'open'
   }
 
-  state = { fetching: false }
-
-  includesContainer = document.createElement('div')
-  includesContainerAttached = false
-
   attachShadow() {
-    const host = this.refs.host
+    const host = this.host
     const root = host.shadowRoot || host.attachShadow({ mode: this.props.boundaryMode })
     const el = (
       <this.props.wrapperTag>
@@ -42,11 +37,8 @@ export default class ShadowReact extends Component {
     return root
   }
 
-  attachedCallback() {
-    const { attachedCallback } = this.props
-    attachedCallback && attachedCallback(this)
-  }
-
+  includesContainer = document.createElement('div')
+  includesContainerAttached = false
   async attachIncludes(root) {
     if (this.includesContainerAttached) {
       this.includesContainer.innerHTML = ''
@@ -56,15 +48,10 @@ export default class ShadowReact extends Component {
     }
 
     const { includes } = this.props
-    if (!includes.length) {
-      this.attachedCallback()
+    if (!includes.length)
       return
-    }
-
-    this.setState({ fetching: true })
 
     const fragment = document.createDocumentFragment()
-
     const elements = await Promise.all(includes.map(async url => {
       const ext = url.split('.').pop()
       const infos = {
@@ -83,19 +70,27 @@ export default class ShadowReact extends Component {
         console.log(err)
       }
     }))
-
     elements.forEach(element => {
       if (element)
         fragment.appendChild(element)
     })
 
     this.includesContainer.appendChild(fragment)
-    this.refs.host && this.setState({ fetching: false }, this.attachedCallback())
   }
 
   componentDidMount() {
+    this.update()
+  }
+
+  componentDidUpdate() {
+    this.update()
+  }
+
+  update = async () => {
     const root = this.attachShadow()
-    this.attachIncludes(root)
+    await this.attachIncludes(root)
+    const { attachedCallback } = this.props
+    attachedCallback && attachedCallback(this)
   }
 
   render() {
@@ -104,16 +99,6 @@ export default class ShadowReact extends Component {
       throw new Error('ShadowReact: Passed direct child must be a concrete HTML element rather than another React component')
 
     const host = dissocPath(['props', 'children'])(directChild)
-    return <host.type ref='host' {...host.props} className={`${host.props.className ? host.props.className : ''} ${this.state.fetching ? '@ShadowReact_fetching' : '@ShadowReact_fetched'}`.trim()} />
-  }
-
-  update() {
-    return new Promise(async resolve => {
-      const root = this.attachShadow()
-      await this.attachIncludes(root)
-      resolve()
-    })
+    return <host.type ref={host => this.host = host} {...directChild.props} />
   }
 }
-
-
